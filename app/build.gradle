@@ -1,0 +1,180 @@
+
+plugins {
+    id 'com.android.application'  
+}
+
+android {
+    namespace 'com.star4droid.star2d.evo'
+    compileSdk 36
+    buildToolsVersion '37.0.0'
+    lint {
+    disable 'MissingTranslation', 'TypographyFractions'
+    checkOnly 'NewApi', 'HandlerLeak'
+    abortOnError false
+    checkReleaseBuilds false
+    }
+    testOptions {
+        unitTests.all {
+            enabled = false
+        }
+    }
+    signingConfigs {
+        release {
+            def keystorePath = System.getenv("KEYSTORE_FILE") ?: "Star4droid.jks"
+            def keystoreFile = file(keystorePath)
+            if (keystoreFile.exists()) {
+                storeFile keystoreFile
+                storePassword System.getenv("KEYSTORE_PASSWORD")
+                keyAlias System.getenv("KEY_ALIAS")
+                keyPassword System.getenv("KEYSTORE_PASSWORD")
+            } else {
+                println "Release keystore '${keystoreFile.absolutePath}' not found. Using debug keystore."
+                initWith signingConfigs.debug
+            }
+        }
+    }
+    defaultConfig {
+        applicationId "com.star4droid.star2d.evo"
+        minSdk 24
+        targetSdk 36
+        versionCode 51
+        versionName "0.5.1Beta"
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_SUPPORT_FLEXIBLE_PAGE_SIZES=ON"
+            }
+        }
+        vectorDrawables { 
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
+        }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+    }
+
+    if (file("google-services.json").exists()) {
+        apply plugin: 'com.google.gms.google-services'
+        apply plugin: 'com.google.firebase.crashlytics'
+    }
+
+    buildFeatures {
+        buildConfig true
+    }
+    
+}
+
+ext {
+    gdxVersion = '1.14.2'
+}
+
+configurations { natives }
+
+dependencies {
+
+    implementation("com.google.android.material:material:1.14.0")
+    implementation(projects.formatter)
+    implementation("com.android.billingclient:billing:9.1.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation(fileTree(dir: "libs", include: ["*.jar","*.aar"]))
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.google.code.gson:gson:2.10.1")
+    // Claude remote control: WebSocket to the Star2D Remote server
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    // Git (HTTPS only): JGit 5.13 is the last line that runs on Java 8 / Android
+    implementation("org.eclipse.jgit:org.eclipse.jgit:5.13.3.202401111512-r") {
+        exclude group: 'org.slf4j'
+    }
+    implementation("org.slf4j:slf4j-nop:1.7.36")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs_nio:2.1.5")
+    implementation("com.google.guava:guava:32.0.1-android")
+    implementation("com.android.tools:r8:8.1.56")
+    implementation(platform("io.github.rosemoe:editor-bom:0.24.5"))
+    implementation("io.github.rosemoe:editor")
+    implementation("io.github.rosemoe:language-textmate")
+    implementation("com.badlogicgames.gdx:gdx:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-freetype:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-backend-android:$gdxVersion")
+    implementation("com.badlogicgames.gdx:gdx-box2d:$gdxVersion")
+    implementation("com.kotcrab.vis:vis-ui:1.5.9")
+    
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-x86_64"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-x86_64"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-armeabi-v7a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-arm64-v8a"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86"
+    natives "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-x86_64"
+
+    
+    testImplementation("com.badlogicgames.gdx:gdx-platform:$gdxVersion")
+    testImplementation("com.badlogicgames.gdx:gdx-backend-lwjgl:$gdxVersion")
+    testImplementation("com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion")
+    
+    constraints {
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.3.21") {
+            because("kotlin-stdlib-jdk7 is now a part of kotlin-stdlib")
+        }
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.3.21") {
+            because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
+        }
+    }
+    
+    implementation(platform("com.google.firebase:firebase-bom:34.3.0"))
+    implementation("com.google.firebase:firebase-crashlytics-ndk")
+    implementation("com.google.firebase:firebase-analytics")
+
+
+}
+
+// Called every time gradle gets executed, takes the native dependencies of
+// the natives configuration, and extracts them to the proper libs/ folders
+// so they get packed with the APK.
+tasks.register('copyAndroidNatives') {
+    doFirst {
+        file("libs/armeabi-v7a/").mkdirs()
+        file("libs/arm64-v8a/").mkdirs()
+        file("libs/x86_64/").mkdirs()
+        file("libs/x86/").mkdirs()
+
+        configurations.natives.copy().files.each { jar ->
+            def outputDir = null
+            if(jar.name.endsWith("natives-armeabi-v7a.jar")) outputDir = file("libs/armeabi-v7a")
+            if(jar.name.endsWith("natives-arm64-v8a.jar")) outputDir = file("libs/arm64-v8a")
+            if(jar.name.endsWith("natives-x86_64.jar")) outputDir = file("libs/x86_64")
+            if(jar.name.endsWith("natives-x86.jar")) outputDir = file("libs/x86")
+            if(outputDir != null) {
+                copy {
+                    from zipTree(jar)
+                    into outputDir
+                    include "*.so"
+                }
+            }
+        }
+    }
+}
+
+tasks.matching { it.name.contains("merge") && it.name.contains("JniLibFolders") }.configureEach { packageTask ->
+    packageTask.dependsOn 'copyAndroidNatives'
+}
