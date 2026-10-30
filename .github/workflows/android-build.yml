@@ -29,8 +29,32 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      # 🔑 Signing keystore (Modified for Lo3bati)
+      # With the secret KEYSTORE_BASE64 the release keystore is restored to app/Star4droid.jks.
+      # Without it a debug keystore is generated so the build can finish (test APK only; the key changes on every run).
+      - name: Prepare signing keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_BASE64" ]; then
+            echo "$KEYSTORE_BASE64" | base64 -d > "$GITHUB_WORKSPACE/app/Star4droid.jks"
+            echo "Using the release keystore from secrets."
+          else
+            for d in "$HOME/.android" "$HOME/.config/.android"; do
+              mkdir -p "$d"
+              if [ ! -f "$d/debug.keystore" ]; then
+                keytool -genkeypair -keystore "$d/debug.keystore" -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+              fi
+            done
+            echo "No KEYSTORE_BASE64 secret: using a generated debug keystore (test APK)."
+          fi
+
       # ⚡ Build APK
       - name: Build APK with Gradle
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
         run: ./gradlew clean assembleRelease
 
       # 📦 Upload APK as artifact
