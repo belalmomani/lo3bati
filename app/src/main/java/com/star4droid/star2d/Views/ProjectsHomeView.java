@@ -416,11 +416,11 @@ public class ProjectsHomeView extends FrameLayout {
 
         Spinner language = findViewById(R.id.setting_language);
         language.setAdapter(spinnerAdapter(LANG_NAMES));
-        String currentLang = prefs.getString("lang", "en");
+        String currentLang = prefs.getString("lang", "ar");
         language.setSelection(Math.max(0, Arrays.asList(LANG_CODES).indexOf(currentLang)));
         language.setOnItemSelectedListener(new SimpleSelection(position -> {
             String code = LANG_CODES[position];
-            if (code.equals(prefs().getString("lang", "en"))) return;
+            if (code.equals(prefs().getString("lang", "ar"))) return;
             prefs().edit().putString("lang", code).putBoolean("langSelected", true).commit();
             askRestart();
         }));
@@ -528,13 +528,13 @@ public class ProjectsHomeView extends FrameLayout {
     }
 
     private void askLanguageOnFirstRun() {
-        if (prefs().getBoolean("langSelected", false)) return;
+        if (prefs().getBoolean("langSelected", true)) return; // Modified for Lo3bati: Arabic is the default, no first-run language prompt
         new AlertDialog.Builder(activity)
                 .setTitle("Language / اللغة")
                 .setCancelable(false)
                 .setItems(LANG_NAMES, (d, which) -> {
                     String code = LANG_CODES[which];
-                    boolean changed = !code.equals(prefs().getString("lang", "en"));
+                    boolean changed = !code.equals(prefs().getString("lang", "ar"));
                     // commit() (not apply): the process restarts right after
                     prefs().edit().putString("lang", code).putBoolean("langSelected", true).commit();
                     if (changed) restartApp();

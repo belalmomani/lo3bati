@@ -1047,7 +1047,7 @@ public class scene1 extends StageImp {
     TextDef Text1_def = new TextDef();
     Text1_def.Script = "Text1";
     Text1_def.Font_Scale = 5.0f;
-    Text1_def.Text = "X0";
+    Text1_def.Text = "×0";
     Text1_def.Version = "1.0";
     Text1_def.x = 40.661976f;
     Text1_def.name = "Text1";
@@ -1187,7 +1187,7 @@ public class scene1 extends StageImp {
     if (checkCollision(player, coin1)) {
       coin1.destroy();
       coinCount += 1;
-      Text1.setItemText("X" + String.valueOf(coinCount));
+      Text1.setItemText("×" + String.valueOf(coinCount));
       if (coinCount == 3) {
         openScene("win");
 
@@ -1201,7 +1201,7 @@ public class scene1 extends StageImp {
     if (checkCollision(player, coin2)) {
       coin2.destroy();
       coinCount += 1;
-      Text1.setItemText("X" + String.valueOf(coinCount));
+      Text1.setItemText("×" + String.valueOf(coinCount));
       if (coinCount == 3) {
         openScene("win");
 
@@ -1215,7 +1215,7 @@ public class scene1 extends StageImp {
     if (checkCollision(player, coin3)) {
       coin3.destroy();
       coinCount += 1;
-      Text1.setItemText("X" + String.valueOf(coinCount));
+      Text1.setItemText("×" + String.valueOf(coinCount));
       if (coinCount == 3) {
         openScene("win");
 

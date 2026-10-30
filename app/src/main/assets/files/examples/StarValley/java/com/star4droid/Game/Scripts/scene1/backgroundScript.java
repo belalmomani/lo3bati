@@ -31,7 +31,7 @@ public class backgroundScript extends ItemScript {
         GdxTime time = GdxTime.getTime(1440*2);
         getPlayerItem().getActor().setColor(time.getTint());
         if(text!=null)
-            text.setItemText("Time : "+two(time.getHour())+":"+two(time.getMin()));
+            text.setItemText("الوقت : "+two(time.getHour())+":"+two(time.getMin()));
          else text = getStage().findItem("text");
     }
     

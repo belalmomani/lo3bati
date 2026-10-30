@@ -32,7 +32,7 @@ public class playerScript extends ItemScript {
         if(other.getParentName().equals("coin")){
             other.destroy();
             coins++;
-            findItem("text").setItemText("coins : "+coins);
+            findItem("text").setItemText("العملات : "+coins);
         }
         if(other.getParentName().contains("ground")){
                 other.getBody().setTransform(new Vector2(other.getBodyX(),other.getBodyY()+25),0);

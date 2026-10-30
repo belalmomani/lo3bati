@@ -150,7 +150,7 @@ public class TestApp implements ApplicationListener {
 		Gdx.input.setInputProcessor(projectsListStage);
 		if(this.whenAppReady!=null)
 			this.whenAppReady.run();
-		if(!preferences.getBoolean("langSelected")){
+		if(!preferences.getBoolean("langSelected", true)){ // Modified for Lo3bati: Arabic default, no first-run prompt
 			new LanguageDialog(this).show(projectsListStage).toFront();
 		}
 		

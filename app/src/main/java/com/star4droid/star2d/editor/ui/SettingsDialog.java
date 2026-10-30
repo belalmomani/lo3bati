@@ -37,7 +37,7 @@ public class SettingsDialog extends VisDialog {
 		SpinnerInput lang = new SpinnerInput();
 		lang.setNameText(getTrans("language"));
 		lang.setData("English","العربيه","Français","Português","Русский","Español");
-		String language = preferences.getString("lang","en");
+		String language = preferences.getString("lang","ar");
 		
 		switch(language){
 		    case "en":
@@ -183,7 +183,7 @@ public class SettingsDialog extends VisDialog {
 	@Override
 	public VisDialog show(Stage arg0, Action arg1) {
 		refreshEditorFields();
-		langOnStart = app.preferences.getString("lang","en");
+		langOnStart = app.preferences.getString("lang","ar");
 		return super.show(arg0, arg1);
 	}
 }

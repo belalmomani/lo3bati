@@ -713,7 +713,7 @@ public class scene1 extends StageImp {
 
     TextDef Text1_def = new TextDef();
     Text1_def.Script = "Text1";
-    Text1_def.Text = "Welcome to Star2D";
+    Text1_def.Text = "مرحباً بك في لعبتي";
     Text1_def.x = 16.897074f;
     Text1_def.name = "Text1";
     Text1_def.width = 711.3322f;

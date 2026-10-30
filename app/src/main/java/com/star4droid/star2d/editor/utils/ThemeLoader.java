@@ -119,7 +119,7 @@ public class ThemeLoader {
 
     // load all images from assets...
     loadTheme(Gdx.files.internal("images"), "", null);
-	Lang.loadTrans(TestApp.getCurrentApp().preferences.getString("lang","en"));
+	Lang.loadTrans(TestApp.getCurrentApp().preferences.getString("lang","ar"));
   }
   
   public static Skin getOrangeSkin(){

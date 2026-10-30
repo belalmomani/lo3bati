@@ -72,4 +72,10 @@
 	<string name="update">تحديث</string>
 	<string name="close">إغلاق</string>
 	<string name="splash_hint">المس الشاشة</string>
+	<!-- Modified for Lo3bati: Arabic for strings that were missing -->
+	<string name="tutorial">الدروس التعليمية</string>
+	<string name="particle_effect">تأثير الجسيمات</string>
+	<string name="point_light">ضوء نقطي</string>
+	<string name="directional_light">ضوء اتجاهي</string>
+	<string name="cone_light">ضوء مخروطي</string>
 </resources>

@@ -22,7 +22,7 @@ public class ExamplesDialog extends VisDialog {
 	public ExamplesDialog(TestApp app){
 		super(getTrans("examplesDialog"));
 		this.app = app;
-		isArabic = app.preferences.getString("lang","en").equals("ar") ? ".ar" : "";
+		isArabic = app.preferences.getString("lang","ar").equals("ar") ? ".ar" : "";
 		reset();
 		setFillParent(true);
 		for(FileHandle example:Gdx.files.internal("files/examples").list()){

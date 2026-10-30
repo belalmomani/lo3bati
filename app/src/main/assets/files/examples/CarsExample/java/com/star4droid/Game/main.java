@@ -847,7 +847,7 @@ public class main extends StageImp {
     TextDef txt_def = new TextDef();
     txt_def.Script = "txt";
     txt_def.Font_Scale = 5.0f;
-    txt_def.Text = "coins : 0";
+    txt_def.Text = "العملات : 0";
     txt_def.Version = "1.0";
     txt_def.name = "txt";
     txt_def.width = 495.31616f;

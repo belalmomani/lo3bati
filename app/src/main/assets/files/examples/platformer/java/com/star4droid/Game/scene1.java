@@ -553,9 +553,9 @@ public class scene1 extends StageImp {
     Box2 = (PlayerItem) (Box2_def.build(this));
 
     TextDef text_def = new TextDef();
-    text_def.Script = "coins : 0";
+    text_def.Script = "العملات : 0";
     text_def.Font_Scale = 5.0f;
-    text_def.Text = "coins : 0";
+    text_def.Text = "العملات : 0";
     text_def.Version = "1.0";
     text_def.x = 509.5199f;
     text_def.name = "text";

@@ -18,16 +18,16 @@ public final class Tr {
     private Tr() {}
 
     public static synchronized void init(Context c) {
-        String lang = Ui.prefs(c).getString("lang", "en");
+        String lang = Ui.prefs(c).getString("lang", "ar");
         if (lang.equals(loadedLang) && current != null) return;
         fallback = load(c, "i18n/strings.properties");
         current = load(c, fileFor(lang));
         loadedLang = lang;
     }
 
-    /** Language code of the app ("en", "ar", "fr"...), "en" before init. */
+    /** Language code of the app ("en", "ar", "fr"...), "ar" (Arabic, the Lo3bati default) before init. */
     public static String lang() {
-        return loadedLang == null ? "en" : loadedLang;
+        return loadedLang == null ? "ar" : loadedLang;
     }
 
     private static String fileFor(String lang) {

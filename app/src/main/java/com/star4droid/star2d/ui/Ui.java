@@ -96,7 +96,7 @@ public final class Ui {
     }
 
     public static boolean isRtl(Context c) {
-        return "ar".equals(prefs(c).getString("lang", "en"));
+        return "ar".equals(prefs(c).getString("lang", "ar"));
     }
 
     // ------------------------------------------------------------ units

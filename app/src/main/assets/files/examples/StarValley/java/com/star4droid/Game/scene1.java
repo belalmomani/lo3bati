@@ -158,7 +158,7 @@ public class scene1 extends StageImp {
     TextDef Text3_def = new TextDef();
     Text3_def.Script = "Text1";
     Text3_def.Font_Scale = 3.0f;
-    Text3_def.Text = "This fan rotate from OnBodyUpdate using the Visual Scripting System ";
+    Text3_def.Text = "هذه المروحة تدور من حدث «تحديث العنصر» باستخدام نظام البرمجة المرئية ";
     Text3_def.type = "STATIC";
     Text3_def.x = 916.63495f;
     Text3_def.name = "Text3";
@@ -199,7 +199,7 @@ public class scene1 extends StageImp {
     TextDef Text4_def = new TextDef();
     Text4_def.Script = "Text1";
     Text4_def.Font_Scale = 3.0f;
-    Text4_def.Text = "Day/Night System using GdxTime java file (com.star4droid.Game.GdxTime)";
+    Text4_def.Text = "نظام النهار والليل يعمل بملف جافا مخصص للوقت";
     Text4_def.type = "STATIC";
     Text4_def.x = -788.5659f;
     Text4_def.name = "Text4";
@@ -240,7 +240,7 @@ public class scene1 extends StageImp {
     TextDef getHeartText_def = new TextDef();
     getHeartText_def.Script = "Text1";
     getHeartText_def.Font_Scale = 3.0f;
-    getHeartText_def.Text = "Get This Heart :)";
+    getHeartText_def.Text = "احصل على هذا القلب :)";
     getHeartText_def.type = "STATIC";
     getHeartText_def.x = 275.66174f;
     getHeartText_def.name = "getHeartText";
@@ -281,7 +281,7 @@ public class scene1 extends StageImp {
     TextDef Text2_def = new TextDef();
     Text2_def.Script = "Text1";
     Text2_def.Font_Scale = 3.0f;
-    Text2_def.Text = "Open house script by clicking on \"Body Script\" to see what is going on..";
+    Text2_def.Text = "افتح سكربت المنزل بالضغط على \"سكربت العنصر\" لترى ما يحدث..";
     Text2_def.type = "STATIC";
     Text2_def.x = 661.4524f;
     Text2_def.name = "Text2";
@@ -322,7 +322,7 @@ public class scene1 extends StageImp {
     TextDef Text1_def = new TextDef();
     Text1_def.Script = "Text1";
     Text1_def.Font_Scale = 3.0f;
-    Text1_def.Text = "Under Construction";
+    Text1_def.Text = "تحت الإنشاء";
     Text1_def.type = "STATIC";
     Text1_def.x = -235.67157f;
     Text1_def.name = "Text1";
@@ -1240,7 +1240,7 @@ public class scene1 extends StageImp {
     text_def.Script = "Text1";
     text_def.Text_Color = "FFFFFFFF";
     text_def.Font_Scale = 3.0f;
-    text_def.Text = "Time : 00:00";
+    text_def.Text = "الوقت : 00:00";
     text_def.x = 42.811054f;
     text_def.name = "text";
     text_def.width = 653.30914f;
@@ -1514,7 +1514,7 @@ public class scene1 extends StageImp {
     TextDef Welcome_def = new TextDef();
     Welcome_def.Script = "Welcome";
     Welcome_def.Font_Scale = 6.0f;
-    Welcome_def.Text = "Welcome To Star Valley!";
+    Welcome_def.Text = "مرحباً بك في وادي النجوم!";
     Welcome_def.x = 47.30651f;
     Welcome_def.name = "Welcome";
     Welcome_def.width = 722.1975f;
@@ -1749,7 +1749,7 @@ public class scene1 extends StageImp {
     TextDef where_def = new TextDef();
     where_def.Script = "Text1";
     where_def.Font_Scale = 2.0f;
-    where_def.Text = "where are you going sir ?";
+    where_def.Text = "إلى أين أنت ذاهب يا سيدي ؟";
     where_def.x = 343.2226f;
     where_def.name = "where";
     where_def.Visible = false;

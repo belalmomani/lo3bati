@@ -56,6 +56,6 @@ public class Lang {
 	}
 	
 	public static boolean isRTL(){
-		return TestApp.getCurrentApp().preferences.getString("lang","en").equals("ar");
+		return TestApp.getCurrentApp().preferences.getString("lang","ar").equals("ar");
 	}
 }

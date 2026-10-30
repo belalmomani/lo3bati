@@ -34,7 +34,7 @@ public class CarScript extends ItemScript {
     public void onCollisionBegin(PlayerItem other){
         if(other.getName().toLowerCase().contains("coin")){
             coins = coins + 1;
-            getStage().findItem("txt").setItemText("coins : "+coins);
+            getStage().findItem("txt").setItemText("العملات : "+coins);
             other.destroy();
         }
     }

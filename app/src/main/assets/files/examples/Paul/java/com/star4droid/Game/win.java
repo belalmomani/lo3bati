@@ -155,7 +155,7 @@ public class win extends StageImp {
     TextDef Text1_def = new TextDef();
     Text1_def.Script = "Text1";
     Text1_def.Font_Scale = 12.0f;
-    Text1_def.Text = "You win!";
+    Text1_def.Text = "لقد فزت!";
     Text1_def.Version = "1.0";
     Text1_def.x = 649.71674f;
     Text1_def.name = "Text1";

@@ -134,7 +134,7 @@ public class scene1 extends StageImp {
     TextDef txt_def = new TextDef();
     txt_def.Script = "txt";
     txt_def.Font_Scale = 3.0f;
-    txt_def.Text = "Choose Your Car";
+    txt_def.Text = "اختر سيارتك";
     txt_def.Version = "1.0";
     txt_def.x = 107.91519f;
     txt_def.name = "txt";
@@ -915,7 +915,7 @@ public class scene1 extends StageImp {
     Text1_def.Script = "Text1";
     Text1_def.Text_Color = "FFFFFFFF";
     Text1_def.Font_Scale = 3.0f;
-    Text1_def.Text = "Start!";
+    Text1_def.Text = "ابدأ!";
     Text1_def.Version = "1.0";
     Text1_def.x = 233.12878f;
     Text1_def.name = "Text1";

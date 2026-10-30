@@ -68,7 +68,7 @@ public class losescene extends StageImp {
     TextDef Text1_def = new TextDef();
     Text1_def.Script = "Text1";
     Text1_def.Font_Scale = 1.75f;
-    Text1_def.Text = "You Lose!";
+    Text1_def.Text = "لقد خسرت!";
     Text1_def.x = 56.479733f;
     Text1_def.name = "Text1";
     Text1_def.width = 648.58673f;
