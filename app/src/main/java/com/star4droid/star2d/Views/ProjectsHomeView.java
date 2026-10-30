@@ -388,7 +388,7 @@ public class ProjectsHomeView extends FrameLayout {
 
     private void setupCommunity() {
         LinearLayout list = findViewById(R.id.community_list);
-        findViewById(R.id.btn_donate).setOnClickListener(v -> host.openDonate());
+        findViewById(R.id.btn_donate).setVisibility(View.GONE); // Modified for Lo3bati: original author donation entry hidden (DonateActivity kept)
         String[][] links = com.star4droid.star2d.ui.CommunityLinks.all();
         LayoutInflater inflater = LayoutInflater.from(activity);
         for (String[] link : links) {

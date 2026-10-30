@@ -23,12 +23,8 @@ public class SPNote {
 			dialog.setCancelable(false);
 			Utils.hideSystemUi(dialog.getWindow());
 			final Button cancel = v.findViewById(R.id.cancel);
-            v.findViewById(R.id.payeer).setOnClickListener(fv->{
-                Utils.showMessage(context,"Thanks for your help.\n Payeer : P1108466613 (Copied To Clipboard)");
-                ClipboardManager manager = (ClipboardManager)context.getSystemService(Context.CLIPBOARD_SERVICE);
-                manager.setPrimaryClip(ClipData.newPlainText("clipboard","P1108466613"));
-            });
-			buttonLink(v.findViewById(R.id.yt),"https://youtube.com/channel/UCgnoNpqgejMZbqDLtr8NNUw");
+            v.findViewById(R.id.payeer).setOnClickListener(fv->{ /* Modified for Lo3bati: original author payment info removed */ });
+			buttonLink(v.findViewById(R.id.yt),"");
 			buttonLink(v.findViewById(R.id.contact),"");
 			new Thread(){
 				@Override

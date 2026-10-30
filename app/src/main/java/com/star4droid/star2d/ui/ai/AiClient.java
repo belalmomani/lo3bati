@@ -190,7 +190,7 @@ public class AiClient {
             String key = key(p);
             if (!key.isEmpty()) c.setRequestProperty("Authorization", "Bearer " + key);
             if (p.id.equals("openrouter")) {
-                c.setRequestProperty("HTTP-Referer", "https://github.com/star4droid/Star2D");
+                c.setRequestProperty("HTTP-Referer", "");
                 c.setRequestProperty("X-Title", "Star2D Engine");
             }
             try (OutputStream os = c.getOutputStream()) {

@@ -266,7 +266,8 @@ public class EditorActivity extends AppCompatActivity implements AndroidFragment
     // }
 	private void initApp(){
 	    JointsHelper.init();
-	    com.star4droid.star2d.Adapters.UpdateChecker.checkForUpdate(editor.getApp());
+	    // Modified for Lo3bati: update check disabled until UpdateChecker URLs point to the Lo3bati repository (it targeted star4droid/Star2D).
+	    // com.star4droid.star2d.Adapters.UpdateChecker.checkForUpdate(editor.getApp());
 		editor.getApp().setOrienationChanger(landscape->{
 			boolean isCurrentLandscape = getResources().getConfiguration().orientation==Configuration.ORIENTATION_LANDSCAPE;
 			if(isCurrentLandscape == landscape) return;
@@ -399,8 +400,10 @@ public class EditorActivity extends AppCompatActivity implements AndroidFragment
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         // Occasional (rare, snoozable) support dialog, only while the projects screen is showing
         homeView.postDelayed(() -> {
-            if (!isFinishing() && !isDestroyed() && homeView.isShown())
-                com.star4droid.star2d.ui.SupportPrompt.maybeShow(this, this::openDonate);
+            if (!isFinishing() && !isDestroyed() && homeView.isShown()) {
+                // Modified for Lo3bati: original author support/donation prompt disabled.
+                // com.star4droid.star2d.ui.SupportPrompt.maybeShow(this, this::openDonate);
+            }
         }, 3500);
     }
 	@Override

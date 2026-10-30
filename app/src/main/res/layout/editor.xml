@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     xmlns:tools="http://schemas.android.com/tools"
+     android:layout_height="match_parent"
+     android:layout_width="match_parent"
+     android:orientation="vertical"
+     android:fitsSystemWindows="true"
+     android:clipToPadding="true">
+    <LinearLayout
+         android:layout_height="match_parent"
+         android:layout_width="match_parent"
+         android:orientation="vertical">
+        <FrameLayout
+             android:layout_height="match_parent"
+             android:layout_width="match_parent"
+             android:orientation="horizontal"
+             android:layout_weight="1"
+             android:id="@+id/frame">
+            <com.star4droid.star2d.Items.Editor
+                 android:layout_height="match_parent"
+                 android:layout_width="match_parent"
+                 android:id="@+id/editor" />
+        </FrameLayout>
+    </LinearLayout>
+</LinearLayout>

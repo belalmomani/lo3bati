@@ -1,0 +1,26 @@
+pluginManagement {
+  repositories {
+    gradlePluginPortal()
+    google()
+    mavenCentral()
+  }
+}
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+dependencyResolutionManagement {
+  repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+  repositories {
+    mavenCentral()
+    maven { url "https://plugins.gradle.org/m2/" }
+    google()
+  }
+}
+
+rootProject.name = "Star2D"
+
+include(
+   ":app",
+   ":formatter",
+   ":template",
+   ":desktop"
+)

@@ -26,7 +26,7 @@ android {
                 storeFile keystoreFile
                 storePassword System.getenv("KEYSTORE_PASSWORD")
                 keyAlias System.getenv("KEY_ALIAS")
-                keyPassword System.getenv("KEYSTORE_PASSWORD")
+                keyPassword System.getenv("KEY_PASSWORD") ?: System.getenv("KEYSTORE_PASSWORD") // Modified for Lo3bati: optional KEY_PASSWORD
             } else {
                 println "Release keystore '${keystoreFile.absolutePath}' not found. Using debug keystore."
                 initWith signingConfigs.debug
@@ -34,7 +34,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.star4droid.star2d.evo"
+        applicationId "com.lo3bati.gamecreator" // Modified for Lo3bati (was com.star4droid.star2d.evo). namespace stays unchanged on purpose: it is the R/BuildConfig package shared with :template
         minSdk 24
         targetSdk 36
         versionCode 51

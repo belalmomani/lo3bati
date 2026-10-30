@@ -17,7 +17,7 @@ import java.util.List;
 /** The small part of the GitHub REST API the editor needs (no git protocol here, see {@link GitRepo}). */
 public final class GitHubApi {
     /** OAuth App client id used for the device flow (a public value, no secret is needed). */
-    public static final String CLIENT_ID = "Ov23liT7W1qae30HY2Ux";
+    public static final String CLIENT_ID = ""; // Modified for Lo3bati: original author OAuth App id removed; put your own GitHub OAuth App client id here
     public static final String SCOPE = "repo";
 
     private static final String API = "https://api.github.com";

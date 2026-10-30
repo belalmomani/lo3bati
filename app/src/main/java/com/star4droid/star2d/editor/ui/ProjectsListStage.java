@@ -174,7 +174,7 @@ public class ProjectsListStage extends Stage {
         facebookTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.net.openURI("https://facebook.com/groups/995354408402399/");
+                // Modified for Lo3bati: original author link removed
             }
         });
 
@@ -185,7 +185,7 @@ public class ProjectsListStage extends Stage {
         whatsAppTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.net.openURI("https://chat.whatsapp.com/Bxu3kM0b1oE9UL0iZhti4E?mode=ems_copy_c");
+                // Modified for Lo3bati: original author link removed
             }
         });
 
@@ -196,7 +196,7 @@ public class ProjectsListStage extends Stage {
         telegramTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.net.openURI("https://t.me/+pE4VREnP04s5NDNk");
+                // Modified for Lo3bati: original author link removed
             }
         });
 
@@ -207,7 +207,7 @@ public class ProjectsListStage extends Stage {
         discordTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.net.openURI("https://discord.gg/xNeKWxKnwM");
+                // Modified for Lo3bati: original author link removed
             }
         });
 
@@ -218,7 +218,7 @@ public class ProjectsListStage extends Stage {
         githubTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.net.openURI("https://github.com/star4droid/Star2D/");
+                // Modified for Lo3bati: original author link removed
             }
         });
 
@@ -229,7 +229,7 @@ public class ProjectsListStage extends Stage {
         youtubeTable.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                Gdx.net.openURI("https://youtube.com/@star4droid?si=wNDqN_fbRIzf3KSQ");
+                // Modified for Lo3bati: original author link removed
             }
         });
 

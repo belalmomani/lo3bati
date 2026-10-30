@@ -1,0 +1,22 @@
+Lo3bati (لعبتي)
+Copyright 2026 the Lo3bati authors.
+
+This product is a modified derivative work of Star2D.
+
+Original work: Star2D
+  Source:  https://github.com/star4droid/Star2D
+  Author:  star4droid (Star4Droid)
+  License: Apache License, Version 2.0 (see the LICENSE file)
+
+Changes made to the original are listed in LOBATI_REPORT_AR.md and are marked
+by a "Modified for Lo3bati" comment inside each modified source/resource file
+(properties files under app/src/main/assets/i18n/ carry no comment; their change
+is only the "welcome" value, as listed in the report).
+
+The Apache License does not grant permission to use the names, trademarks or
+product names of the original licensor except for reasonable and customary use
+in describing the origin of the work.
+
+Third-party libraries (LibGDX, Box2D, Glide, Gson, JGit, OkHttp, Firebase SDKs,
+and others declared in app/build.gradle) remain under their own licenses.
+Their licenses have NOT been audited in this phase; review before distribution.

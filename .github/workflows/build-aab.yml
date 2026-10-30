@@ -96,7 +96,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1.1.3
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_JSON_KEY }}
-          packageName: com.star4droid.star2d.evo
+          packageName: com.lo3bati.gamecreator # Modified for Lo3bati
           releaseFiles: app/build/outputs/bundle/release/*.aab
           track: production
           status: completed

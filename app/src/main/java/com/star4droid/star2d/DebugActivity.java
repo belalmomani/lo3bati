@@ -45,12 +45,11 @@ public class DebugActivity extends Activity {
 		button1 = findViewById(R.id.button1);
 		button2 = findViewById(R.id.button2);
 		
+		button1.setVisibility(View.GONE); // Modified for Lo3bati: original author Messenger contact removed
 		button1.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View _view) {
-				intent.setAction(Intent.ACTION_VIEW);
-				intent.setData(Uri.parse("https://m.me/Star4Droid2"));
-				startActivity(intent);
+				// Modified for Lo3bati: original author contact removed (button hidden)
 			}
 		});
 		
