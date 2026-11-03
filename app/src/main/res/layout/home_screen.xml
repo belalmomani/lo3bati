@@ -91,7 +91,8 @@
             <TextView android:id="@+id/tab_projects" style="@style/HomeTab" android:text="Projects" />
             <TextView android:id="@+id/tab_learn" style="@style/HomeTab" android:text="Learn" />
             <TextView android:id="@+id/tab_templates" style="@style/HomeTab" android:text="Templates" />
-            <TextView android:id="@+id/tab_community" style="@style/HomeTab" android:text="Community" />
+            <!-- Modified for Lo3bati: Community & Support tab removed from the UI (page and ids kept so the code still works) -->
+            <TextView android:id="@+id/tab_community" style="@style/HomeTab" android:text="Community" android:visibility="gone" />
             <TextView android:id="@+id/tab_settings" style="@style/HomeTab" android:text="Settings" />
         </LinearLayout>
     </HorizontalScrollView>

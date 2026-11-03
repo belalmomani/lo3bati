@@ -93,6 +93,8 @@ final class SimpleMode {
 
     View view() {
         FrameLayout overlay = new FrameLayout(a);
+        // Page = top part, empty gap (touches pass through to the game canvas), bottom part.
+        LinearLayout page = Ui.column(a);
 
         // ---- top: bar + guide
         LinearLayout topCol = Ui.column(a);
@@ -113,8 +115,8 @@ final class SimpleMode {
         });
         hintBox.addView(skip);
         topCol.addView(hintBox, Ui.margins(Ui.matchWrap(), a, 10, 8, 10, 0));
-        overlay.addView(topCol, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.TOP));
+        page.addView(topCol, Ui.matchWrap());
+        page.addView(new View(a), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
         // ---- bottom: object tools (when something is selected) + main buttons
         LinearLayout bottom = Ui.column(a);
@@ -123,11 +125,12 @@ final class SimpleMode {
         toolsBar.setPadding(dp(6), dp(6), dp(6), dp(6));
         toolsBar.setClickable(true);
         toolsBar.setVisibility(View.GONE);
-        toolsBar.addView(toolButton(R.drawable.ic_s2_move, "حرّك", v -> shell.setTool("move")), Ui.margins(Ui.weight(1), a, 3, 0, 3, 0));
-        toolsBar.addView(toolButton(R.drawable.ic_s2_scale, "كبّر أو صغّر", v -> shell.setTool("scale")), Ui.margins(Ui.weight(1), a, 3, 0, 3, 0));
-        toolsBar.addView(toolButton(R.drawable.ic_s2_rotate, "دوّر", v -> shell.setTool("rotate")), Ui.margins(Ui.weight(1), a, 3, 0, 3, 0));
-        toolsBar.addView(toolButton(R.drawable.ic_s2_copy, "انسخ", v -> shell.duplicateSelected()), Ui.margins(Ui.weight(1), a, 3, 0, 3, 0));
-        toolsBar.addView(toolButton(R.drawable.ic_s2_delete, "احذف", v -> shell.deleteSelected()), Ui.margins(Ui.weight(1), a, 3, 0, 3, 0));
+        toolsBar.addView(toolButton(R.drawable.ic_s2_move, "حرّك", v -> shell.setTool("move")), Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
+        toolsBar.addView(toolButton(R.drawable.ic_s2_scale, "حجم", v -> shell.setTool("scale")), Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
+        toolsBar.addView(toolButton(R.drawable.ic_s2_rotate, "دوّر", v -> shell.setTool("rotate")), Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
+        toolsBar.addView(toolButton(R.drawable.ic_s2_image, "صورة", v -> shell.togglePanel(shell.properties)), Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
+        toolsBar.addView(toolButton(R.drawable.ic_s2_copy, "انسخ", v -> shell.duplicateSelected()), Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
+        toolsBar.addView(toolButton(R.drawable.ic_s2_delete, "احذف", v -> shell.deleteSelected()), Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
         bottom.addView(toolsBar, Ui.matchWrap());
 
         LinearLayout main = Ui.row(a);
@@ -144,8 +147,8 @@ final class SimpleMode {
         more.setOnClickListener(v -> showMore());
         main.addView(more, Ui.margins(Ui.weight(1), a, 4, 0, 4, 0));
         bottom.addView(main, Ui.matchWrap());
-        overlay.addView(bottom, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT, Gravity.BOTTOM));
+        page.addView(bottom, Ui.matchWrap());
+        overlay.addView(page, Ui.match());
 
         // ---- "add something" sheet
         sheet = buildSheet();
@@ -164,12 +167,12 @@ final class SimpleMode {
         top.setPadding(dp(8), dp(6), dp(8), dp(6));
         top.setClickable(true);
         top.addView(smallButton("رجوع", v -> shell.exitProject()), new LinearLayout.LayoutParams(-2, -2));
-        top.addView(smallButton("حفظ", v -> shell.save()), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 6, 0, 0, 0));
-        top.addView(smallButton("تراجع", v -> Bridge.gl(() -> Bridge.controls().actionUndo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 6, 0, 0, 0));
-        top.addView(smallButton("إعادة", v -> Bridge.gl(() -> Bridge.controls().actionRedo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 6, 0, 0, 0));
+        top.addView(smallButton("حفظ", v -> shell.save()), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
+        top.addView(smallButton("تراجع", v -> Bridge.gl(() -> Bridge.controls().actionUndo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
+        top.addView(smallButton("إعادة", v -> Bridge.gl(() -> Bridge.controls().actionRedo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
         View space = new View(a);
         top.addView(space, Ui.weight(1));
-        top.addView(smallButton("الوضع الاحترافي", v -> {
+        top.addView(smallButton("احترافي", v -> {
             set(a, false);
             shell.build();
         }), new LinearLayout.LayoutParams(-2, -2));
@@ -177,9 +180,9 @@ final class SimpleMode {
     }
 
     private TextView smallButton(String label, View.OnClickListener l) {
-        TextView t = Ui.text(a, label, 13, Ui.TEXT);
+        TextView t = Ui.text(a, label, 12.5f, Ui.TEXT);
         t.setTypeface(Typeface.DEFAULT_BOLD);
-        t.setPadding(dp(12), dp(8), dp(12), dp(8));
+        t.setPadding(dp(9), dp(7), dp(9), dp(7));
         t.setBackground(Ui.ripple(Ui.SURFACE_2, dp(12)));
         t.setOnClickListener(l);
         return t;
@@ -236,6 +239,20 @@ final class SimpleMode {
 
         LinearLayout col = Ui.column(a);
         col.setPadding(dp(10), 0, dp(10), dp(14));
+        LinearLayout pics = Ui.row(a);
+        pics.setGravity(Gravity.CENTER_VERTICAL);
+        pics.setPadding(dp(14), dp(12), dp(14), dp(12));
+        pics.setBackground(Ui.rounded(0xFF22402A, dp(14)));
+        pics.addView(Ui.smallIcon(a, R.drawable.ic_s2_collections, 0xFF66BB6A, 30));
+        TextView picsText = Ui.text(a, "صور ورسومات جاهزة للعبتك", 15, Ui.TEXT);
+        picsText.setTypeface(Typeface.DEFAULT_BOLD);
+        picsText.setPadding(dp(10), 0, 0, 0);
+        pics.addView(picsText);
+        pics.setOnClickListener(v -> {
+            hideSheet();
+            showCollections();
+        });
+        col.addView(pics, Ui.margins(Ui.matchWrap(), a, 4, 4, 4, 10));
         section(col, "أشياء", THINGS);
         section(col, "كلمات وأرقام", WORDS);
         section(col, "تحكم", CONTROL);
@@ -272,7 +289,7 @@ final class SimpleMode {
                     else Bridge.controls().actionAddBody(pos);
                 });
                 added = true;
-                setHint("ممتاز! أضفتَ «" + name + "» إلى لعبتك. ماذا تريد أن تضيف الآن؟");
+                setHint("ممتاز! أضفتَ «" + name + "» إلى لعبتك. اضغط «صورة» لتلبسه صورة، أو أضف شيئاً آخر.");
             });
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams(GridLayout.spec(GridLayout.UNDEFINED), GridLayout.spec(GridLayout.UNDEFINED, 1f));
             lp.width = 0;
@@ -280,6 +297,12 @@ final class SimpleMode {
             g.addView(card, lp);
         }
         col.addView(g, Ui.matchWrap());
+    }
+
+    /** Free picture packs shipped with the app (copied into the project's images folder). */
+    private void showCollections() {
+        Bridge.query(() -> Bridge.editor().getProject().getPath(),
+                p -> CollectionsDialog.show(a, new java.io.File(p), () -> { }));
     }
 
     private void showSheet() {
@@ -313,7 +336,7 @@ final class SimpleMode {
         Bridge.query(() -> Bridge.editor().getSelectedActor() != null, has -> {
             selected = Boolean.TRUE.equals(has);
             if (toolsBar != null) toolsBar.setVisibility(selected ? View.VISIBLE : View.GONE);
-            if (selected) setHint("اختر ماذا تفعل بهذا الشيء: حرّكه، كبّره، دوّره، انسخه أو احذفه.");
+            if (selected) setHint("اختر ماذا تفعل بهذا الشيء: حرّك، حجم، دوّر، صورة، انسخ أو احذف.");
             else if (added) setHint("المس أي شيء في لعبتك لتغيّره، أو اضغط «أضف شيئاً».");
         });
     }
