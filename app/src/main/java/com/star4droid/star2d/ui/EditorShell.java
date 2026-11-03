@@ -80,6 +80,8 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
     private final com.star4droid.star2d.remote.RemoteSession.Listener sessionListener = this::applyRemoteLock;
 
     private ImageView undoBtn, redoBtn, lockBtn;
+    /** Modified for Lo3bati: kid-friendly simple-mode overlay (null in pro mode). */
+    private SimpleMode simple;
     private final ArrayList<ImageView> toolButtons = new ArrayList<>();
     private final ArrayList<ImageView> railButtons = new ArrayList<>();
     private final ArrayList<PanelHost.Panel> railPanels = new ArrayList<>();
@@ -241,6 +243,32 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
         ilp.gravity = Gravity.TOP | Gravity.CENTER_HORIZONTAL;
         ilp.topMargin = Ui.dp(c, 8);
         middle.addView(indexingChip, ilp);
+
+        // Modified for Lo3bati: simple mode overlay on top of the (still built) full editor; pro mode shows a chip to come back.
+        simple = null;
+        if (!inPrefabMode()) {
+            if (SimpleMode.enabled(c)) {
+                try {
+                    simple = new SimpleMode(this);
+                    View simpleView = simple.view();
+                    root.setVisibility(GONE);
+                    chrome.addView(simpleView, Ui.match());
+                } catch (Throwable t) {
+                    simple = null;
+                    root.setVisibility(VISIBLE);
+                    SimpleMode.set(c, false);
+                }
+            } else {
+                TextView simpleChip = SimpleMode.proChip(c, () -> {
+                    SimpleMode.set(c, true);
+                    build();
+                });
+                FrameLayout.LayoutParams plp = new FrameLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+                plp.gravity = Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL;
+                plp.bottomMargin = Ui.dp(c, 8);
+                middle.addView(simpleChip, plp);
+            }
+        }
 
         panels.refreshLayout();
         refreshTabs();
@@ -526,7 +554,7 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
         toolButtons.add(b);
     }
 
-    private void setTool(String mode) {
+    void setTool(String mode) { // Modified for Lo3bati: package-private (used by SimpleMode)
         Bridge.query(() -> Bridge.controls().actionSetTouchMode(mode), ok -> {
             tool = ok ? mode : "grid";
             if (!ok) Ui.toast(activity, Tr.t("ui_select_first", "Select an element first"));
@@ -651,7 +679,7 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
 
     // =============================================================== actions
 
-    private void exitProject() {
+    void exitProject() { // Modified for Lo3bati: package-private (used by SimpleMode)
         if (inPrefabMode()) {
             leavePrefab();
             return;
@@ -838,7 +866,7 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
         });
     }
 
-    private void duplicateSelected() {
+    void duplicateSelected() { // Modified for Lo3bati: package-private (used by SimpleMode)
         Bridge.query(() -> {
             com.badlogic.gdx.scenes.scene2d.Actor sel = Bridge.editor().getSelectedActor();
             if (sel == null) return false;
@@ -863,7 +891,7 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
         lockBtn.setSelected(locked);
     }
 
-    private void deleteSelected() {
+    void deleteSelected() { // Modified for Lo3bati: package-private (used by SimpleMode)
         Bridge.query(() -> {
             com.badlogic.gdx.scenes.scene2d.Actor sel = Bridge.editor().getSelectedActor();
             if (sel != null && com.star4droid.star2d.prefab.PrefabSession.isFixedRoot(Bridge.editor(), sel)) return "\u0000";
@@ -1048,6 +1076,7 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
     @Override
     public void onSelectionChanged() {
         Ui.ui(() -> {
+            if (simple != null) simple.onSelectionChanged(); // Modified for Lo3bati
             elements.onEditorChanged();
             properties.onSelectionChanged();
             events.onSelectionChanged();
