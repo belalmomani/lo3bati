@@ -33,6 +33,9 @@ jobs:
 
       - name: Set up Android SDK (aapt2)
         uses: android-actions/setup-android@v3
+        # Modified for Lo3bati: the runner already ships the Android SDK; this action fails with
+        # "Failed to find package 'tools'" on newer cmdline-tools, so a failure here must not stop the job.
+        continue-on-error: true
 
       - name: Is the template older than the sources?
         run: |

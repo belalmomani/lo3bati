@@ -225,10 +225,17 @@ public class ProjectsHomeView extends FrameLayout {
     }
 
     /** Reload the projects list (safe to call from any thread). */
+    /** Modified for Lo3bati: set by the simple-mode steps menu ("1. create a game") to open the new-project dialog once the home screen is shown. */
+    public static boolean openNewOnShow = false;
+
     public void refresh() {
         if (Looper.myLooper() != Looper.getMainLooper()) {
             ui.post(this::refresh);
             return;
+        }
+        if (openNewOnShow) {
+            openNewOnShow = false;
+            post(this::createNewProject);
         }
         File[] files = projectsDir.listFiles(File::isDirectory);
         List<File> all = files == null ? new ArrayList<>() : new ArrayList<>(Arrays.asList(files));

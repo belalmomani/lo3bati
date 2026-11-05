@@ -910,7 +910,7 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
         });
     }
 
-    private void sceneColor() {
+    void sceneColor() { // Modified for Lo3bati: package-private (used by SimpleMode)
         Bridge.query(() -> {
             Bridge.controls().beginSceneColor();
             return Bridge.controls().getSceneColorHex();
