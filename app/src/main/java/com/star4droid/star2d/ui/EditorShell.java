@@ -244,19 +244,32 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
         ilp.topMargin = Ui.dp(c, 8);
         middle.addView(indexingChip, ilp);
 
-        // Modified for Lo3bati: simple mode overlay on top of the (still built) full editor; pro mode shows a chip to come back.
+        // Modified for Lo3bati: simple mode. The pro bars stay built (hidden); the simple bars use the same column
+        // layout the pro bars use (top row, flexible canvas area, bottom row). Pro mode shows a chip to come back.
         simple = null;
         if (!inPrefabMode()) {
             if (SimpleMode.enabled(c)) {
                 try {
                     simple = new SimpleMode(this);
-                    View simpleView = simple.view();
-                    root.setVisibility(GONE);
-                    chrome.addView(simpleView, Ui.match());
+                    View simpleTop = simple.topView();
+                    View simpleBottom = simple.bottomView();
+                    View simpleSheets = simple.sheetsView();
+                    for (int i = 0; i < root.getChildCount(); i++) {
+                        View child = root.getChildAt(i);
+                        if (child != middle) child.setVisibility(GONE);
+                    }
+                    for (int i = 0; i < middle.getChildCount(); i++) {
+                        View child = middle.getChildAt(i);
+                        if (child != indexingChip) child.setVisibility(GONE);
+                    }
+                    root.addView(simpleTop, 0, Ui.matchWrap());
+                    root.addView(simpleBottom, Ui.matchWrap());
+                    chrome.addView(simpleSheets, Ui.match());
                 } catch (Throwable t) {
                     simple = null;
-                    root.setVisibility(VISIBLE);
                     SimpleMode.set(c, false);
+                    build();
+                    return;
                 }
             } else {
                 TextView simpleChip = SimpleMode.proChip(c, () -> {

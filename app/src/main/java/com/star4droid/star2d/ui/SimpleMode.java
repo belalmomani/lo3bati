@@ -99,10 +99,33 @@ final class SimpleMode {
         return Ui.dp(a, v);
     }
 
-    View view() {
+    private boolean built = false;
+    private LinearLayout topPart;
+    private LinearLayout bottomPart;
+    private FrameLayout sheetsLayer;
+
+    /** Top bar + guide message. Added by EditorShell as the first row of the editor column (same mechanism the pro bars use). */
+    View topView() {
+        buildAll();
+        return topPart;
+    }
+
+    /** Context tools + main buttons. Added by EditorShell under the canvas area. */
+    View bottomView() {
+        buildAll();
+        return bottomPart;
+    }
+
+    /** The two pop-up sheets (add something / steps), drawn over everything. */
+    View sheetsView() {
+        buildAll();
+        return sheetsLayer;
+    }
+
+    private void buildAll() {
+        if (built) return;
+        built = true;
         FrameLayout overlay = new FrameLayout(a);
-        // Page = top part, empty gap (touches pass through to the game canvas), bottom part.
-        LinearLayout page = Ui.column(a);
 
         // ---- top: bar + guide
         LinearLayout topCol = Ui.column(a);
@@ -123,8 +146,6 @@ final class SimpleMode {
         });
         hintBox.addView(skip);
         topCol.addView(hintBox, Ui.margins(Ui.matchWrap(), a, 10, 8, 10, 0));
-        page.addView(topCol, Ui.matchWrap());
-        page.addView(new View(a), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1f));
 
         // ---- bottom: object tools (when something is selected) + main buttons
         LinearLayout bottom = Ui.column(a);
@@ -154,8 +175,6 @@ final class SimpleMode {
         more.setOnClickListener(v -> showMore());
         main.addView(more, Ui.margins(Ui.weight(1), a, 4, 0, 4, 0));
         bottom.addView(main, Ui.matchWrap());
-        page.addView(bottom, Ui.matchWrap());
-        overlay.addView(page, Ui.match());
 
         // ---- numbered steps popup (optional)
         stepsSheet = Ui.column(a);
@@ -172,7 +191,9 @@ final class SimpleMode {
         overlay.addView(sheet, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, h, Gravity.BOTTOM));
 
         setHint("اضغط «أضف شيئاً» لتضيف أول شيء إلى لعبتك.");
-        return overlay;
+        topPart = topCol;
+        bottomPart = bottom;
+        sheetsLayer = overlay;
     }
 
     private View topBar() {
