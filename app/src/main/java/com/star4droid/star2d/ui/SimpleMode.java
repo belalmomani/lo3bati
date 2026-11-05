@@ -204,7 +204,9 @@ final class SimpleMode {
         top.addView(smallButton("حفظ", v -> shell.save()), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
         top.addView(smallButton("تراجع", v -> Bridge.gl(() -> Bridge.controls().actionUndo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
         top.addView(smallButton("إعادة", v -> Bridge.gl(() -> Bridge.controls().actionRedo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
-        top.addView(new View(a), Ui.weight(1));
+        // A plain View with wrap_content height takes ALL the height it is offered (View.getDefaultSize), which made this
+        // bar as tall as the screen. Give the spacer a fixed 1px height.
+        top.addView(new View(a), new LinearLayout.LayoutParams(0, 1, 1f));
         TextView steps = smallButton("الخطوات", v -> showSteps());
         steps.setBackground(Ui.rounded(0xFF1E88E5, dp(12)));
         top.addView(steps, Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
