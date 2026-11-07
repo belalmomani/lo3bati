@@ -1202,6 +1202,7 @@ public class EditorShell extends FrameLayout implements ControlLayer.NativeUi, T
 
     private void updateVisibility() {
         setVisibility(projectOpen && !playing && !toolOpen ? VISIBLE : GONE);
+        if (simple != null && getVisibility() == VISIBLE) simple.onShown(); // Modified for Lo3bati: first-run lesson
     }
 
     /** A full-screen LibGDX tool opened / closed (see TestApp.NativeHooks): hide the editor chrome while it is open, restore it on close. */

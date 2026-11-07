@@ -29,7 +29,7 @@ import com.star4droid.star2d.ui.panels.ElementsPanel;
 
 final class SimpleMode {
     /** Shown in the top bar so a screenshot tells which build is really running. */
-    static final String BUILD_TAG = "نسخة 15";
+    static final String BUILD_TAG = "نسخة 16";
     private static final String FILE = "lo3bati_ui";
     private static final String KEY = "simple_mode";
 
@@ -87,6 +87,15 @@ final class SimpleMode {
     private TextView hint;
     private LinearLayout sheet;
     private LinearLayout stepsSheet;
+    // first-run lesson
+    private int tour = 0; // 0 = off, 1..8 = current step
+    private boolean tourAsked = false;
+    private boolean wiring = false;
+    private TextView nextBtn;
+    private View addBtn, playBtn, moveBtn;
+    private final HashMap<String, View> cardViews = new HashMap<>();
+    private android.animation.ValueAnimator pulseAnim;
+    private View pulsing;
     private final boolean[] done = new boolean[8];
     private boolean added = false;
     private boolean hintHidden = false;
@@ -143,9 +152,17 @@ final class SimpleMode {
         TextView skip = Ui.text(a, "تخطَّ", 13, 0xFF7A5C00);
         skip.setPadding(dp(10), dp(4), dp(4), dp(4));
         skip.setOnClickListener(v -> {
+            if (tour != 0) {
+                endTour();
+                return;
+            }
             hintHidden = true;
             hintBox.setVisibility(View.GONE);
         });
+        nextBtn = smallButton("التالي", v -> tourNext());
+        nextBtn.setBackground(Ui.rounded(0xFF43A047, dp(12)));
+        nextBtn.setVisibility(View.GONE);
+        hintBox.addView(nextBtn, Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 6, 0, 0, 0));
         hintBox.addView(skip);
         topCol.addView(hintBox, Ui.margins(Ui.matchWrap(), a, 10, 8, 10, 0));
 
@@ -168,8 +185,13 @@ final class SimpleMode {
         main.setPadding(dp(8), dp(8), dp(8), dp(10));
         main.setGravity(Gravity.CENTER_VERTICAL);
         main.setClickable(true);
-        main.addView(bigButton(R.drawable.ic_s2_add, "أضف شيئاً", 0xFFFF9800, v -> showSheet()), Ui.margins(Ui.weight(2), a, 4, 0, 4, 0));
-        main.addView(bigButton(R.drawable.ic_s2_play, "العب الآن", 0xFF43A047, v -> shell.play()), Ui.margins(Ui.weight(2), a, 4, 0, 4, 0));
+        addBtn = bigButton(R.drawable.ic_s2_add, "أضف شيئاً", 0xFFFF9800, v -> showSheet());
+        main.addView(addBtn, Ui.margins(Ui.weight(2), a, 4, 0, 4, 0));
+        playBtn = bigButton(R.drawable.ic_s2_play, "العب الآن", 0xFF43A047, v -> {
+            tourEvent("play");
+            shell.play();
+        });
+        main.addView(playBtn, Ui.margins(Ui.weight(2), a, 4, 0, 4, 0));
         TextView more = Ui.text(a, "المزيد", 14, Ui.TEXT);
         more.setGravity(Gravity.CENTER);
         more.setBackground(Ui.ripple(Ui.SURFACE_2, dp(16)));
@@ -266,6 +288,7 @@ final class SimpleMode {
     }
 
     private void setHint(String s) {
+        if (tour != 0) return; // the lesson owns the guide bar while it runs
         if (hint != null) hint.setText(s);
         if (hintBox != null && !hintHidden) hintBox.setVisibility(View.VISIBLE);
     }
@@ -333,6 +356,7 @@ final class SimpleMode {
             t.setGravity(Gravity.CENTER);
             t.setPadding(0, dp(6), 0, 0);
             card.addView(t);
+            cardViews.put(name, card);
             card.setOnClickListener(v -> {
                 hideSheet();
                 Bridge.gl(() -> {
@@ -342,6 +366,7 @@ final class SimpleMode {
                 added = true;
                 done[2] = true;
                 setHint("ممتاز! أضفتَ «" + name + "» إلى لعبتك. اضغط «صورة» لتلبسه صورة، أو أضف شيئاً آخر.");
+                tourEvent("added:" + name);
             });
             GridLayout.LayoutParams lp = new GridLayout.LayoutParams(GridLayout.spec(GridLayout.UNDEFINED), GridLayout.spec(GridLayout.UNDEFINED, 1f));
             lp.width = 0;
@@ -361,6 +386,7 @@ final class SimpleMode {
         shell.panels.hide();
         hideSteps();
         sheet.setVisibility(View.VISIBLE);
+        tourEvent("sheet");
     }
 
     private void hideSheet() {
@@ -394,6 +420,16 @@ final class SimpleMode {
         TextView note = Ui.text(a, "الخطوات اختيارية، اضغط أي خطوة لتبدأها.", 13, Ui.TEXT_3);
         note.setPadding(dp(16), 0, dp(16), dp(6));
         stepsSheet.addView(note, Ui.matchWrap());
+        TextView lesson = Ui.text(a, "ابدأ الدرس الأول: لعبتك الأولى خطوة بخطوة", 15, 0xFFFFFFFF);
+        lesson.setTypeface(Typeface.DEFAULT_BOLD);
+        lesson.setGravity(Gravity.CENTER);
+        lesson.setPadding(dp(10), dp(12), dp(10), dp(12));
+        lesson.setBackground(Ui.rounded(0xFF43A047, dp(14)));
+        lesson.setOnClickListener(v -> {
+            hideSteps();
+            startTour();
+        });
+        stepsSheet.addView(lesson, Ui.margins(Ui.matchWrap(), a, 10, 4, 10, 6));
         for (int i = 0; i < STEPS.length; i++) {
             final int n = i + 1;
             LinearLayout row = Ui.row(a);
@@ -486,6 +522,7 @@ final class SimpleMode {
         Bridge.query(() -> Bridge.editor().getSelectedActor() != null, has -> {
             selected = Boolean.TRUE.equals(has);
             updateContext();
+            if (selected) tourEvent("selected");
             if (selected) setHint("هذه أدوات الشيء المحدد فقط: حرّك، المظهر، السلوك، انسخ أو احذف.");
             else if (added) setHint("المس أي شيء لتغيّره، أو المس الخلفية لتغيّر اللعبة نفسها.");
         });
@@ -499,8 +536,9 @@ final class SimpleMode {
         toolsBar.removeAllViews();
         if (selected) {
             contextLabel.setText("أدوات الشيء المحدد");
-            addCtx(R.drawable.ic_s2_move, "حرّك", v -> {
+            moveBtn = addCtx(R.drawable.ic_s2_move, "حرّك", v -> {
                 shell.setTool("move");
+                tourEvent("move");
                 setHint("اسحب الشيء بإصبعك إلى المكان الذي تريده.");
             });
             addCtx(R.drawable.ic_s2_palette, "المظهر", v -> showAppearance());
@@ -514,8 +552,10 @@ final class SimpleMode {
         }
     }
 
-    private void addCtx(int icon, String label, View.OnClickListener l) {
-        toolsBar.addView(toolButton(icon, label, l), Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
+    private View addCtx(int icon, String label, View.OnClickListener l) {
+        View b = toolButton(icon, label, l);
+        toolsBar.addView(b, Ui.margins(Ui.weight(1), a, 2, 0, 2, 0));
+        return b;
     }
 
     private void menu(String title, String[] names, Runnable[] actions) {
@@ -872,5 +912,230 @@ final class SimpleMode {
                 }).show();
             });
         });
+    }
+    // =============================================================== first-run lesson: "your first game", step by step
+    // Each step says exactly where to tap and WHY, pulses the button to tap, and moves on when the user does it.
+
+    private static final String PREF_TOUR_DONE = "tour_done";
+
+    /** Called by EditorShell every time the editor becomes visible (a project is open). */
+    void onShown() {
+        if (tourAsked || tour != 0) return;
+        tourAsked = true;
+        if (prefs(a).getBoolean(PREF_TOUR_DONE, false)) return;
+        new AlertDialog.Builder(a)
+                .setTitle("أهلاً بك في لعبتي!")
+                .setMessage("هل تريد أن نصنع معاً لعبتك الأولى خطوة بخطوة؟ سأريك أين تضغط ولماذا، وتستغرق دقائق قليلة.")
+                .setPositiveButton("نعم، هيا", (d, w) -> startTour())
+                .setNegativeButton("لاحقاً", (d, w) -> {
+                    prefs(a).edit().putBoolean(PREF_TOUR_DONE, true).apply();
+                    setHint("يمكنك بدء الدرس الأول في أي وقت من زر «الخطوات».");
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private void startTour() {
+        tour = 1;
+        tourShow();
+    }
+
+    private void endTour() {
+        tour = 0;
+        stopPulse();
+        if (nextBtn != null) nextBtn.setVisibility(View.GONE);
+        prefs(a).edit().putBoolean(PREF_TOUR_DONE, true).apply();
+        setHint("تم إيقاف الدرس. يمكنك بدؤه من جديد من زر «الخطوات».");
+    }
+
+    private void finishTour() {
+        tour = 0;
+        stopPulse();
+        if (nextBtn != null) nextBtn.setVisibility(View.GONE);
+        prefs(a).edit().putBoolean(PREF_TOUR_DONE, true).apply();
+        setHint("رائع! صنعتَ لعبتك الأولى. لتضيف عملة أو عدواً: المس الشيء ثم «السلوك». ولتغيّر الخلفية: المس مكاناً فارغاً.");
+    }
+
+    private void say(String s, String nextLabel) {
+        if (hint != null) hint.setText(s);
+        if (hintBox != null) hintBox.setVisibility(View.VISIBLE);
+        if (nextBtn != null) {
+            if (nextLabel == null) {
+                nextBtn.setVisibility(View.GONE);
+            } else {
+                nextBtn.setText(nextLabel);
+                nextBtn.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    private void tourShow() {
+        stopPulse();
+        switch (tour) {
+            case 1:
+                say("الخطوة 1 من 8: لنضف لاعبك الأول. اضغط الزر البرتقالي «أضف شيئاً» في الأسفل ⬇", null);
+                pulse(addBtn);
+                break;
+            case 2:
+                say("الخطوة 2 من 8: اختر «مربع». سيكون هذا لاعبك، نبدأ بشكل بسيط نحرّكه. (إن أُغلقت اللوحة اضغط «أضف شيئاً»)", null);
+                pulse(cardViews.get("مربع"));
+                break;
+            case 3:
+                if (selected) {
+                    tour = 4;
+                    tourShow();
+                    return;
+                }
+                say("الخطوة 3 من 8: أحسنت! هذا لاعبك. المسه بإصبعك لتختاره، فتظهر في الأسفل أدواته الخاصة به فقط.", null);
+                break;
+            case 4:
+                say("الخطوة 4 من 8: اضغط «حرّك» ⬇ لتنقل لاعبك إلى المكان الذي تريده.", null);
+                pulse(moveBtn);
+                break;
+            case 5:
+                say("الخطوة 5 من 8: اسحب لاعبك بإصبعك إلى أي مكان في الشاشة. وعندما تنتهي اضغط «التالي».", "التالي");
+                break;
+            case 6:
+                say("الخطوة 6 من 8: لاعبك لا يتحرك وحده! نحتاج «عصا التحكم» لنحرّكه بإصبعنا. اضغط «أضف شيئاً» ثم اختر «عصا التحكم».", null);
+                pulse(addBtn);
+                break;
+            case 7:
+                say("الخطوة 7 من 8: الآن نربط العصا باللاعب، فيتحرك حين تحرّك العصا. اضغط «اربط العصا باللاعب».", "اربط العصا باللاعب");
+                break;
+            case 8:
+                say("الخطوة 8 من 8: اضغط الزر الأخضر «العب الآن» ⬇ وحرّك لاعبك بالعصا!", null);
+                pulse(playBtn);
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void tourNext() {
+        if (tour == 5) {
+            tour = 6;
+            tourShow();
+        } else if (tour == 7) {
+            tourWire();
+        }
+    }
+
+    private void tourEvent(String e) {
+        if (tour == 0) return;
+        switch (tour) {
+            case 1:
+                if (e.equals("sheet")) {
+                    tour = 2;
+                    tourShow();
+                }
+                break;
+            case 2:
+                if (e.equals("added:مربع") || e.equals("added:كرة")) {
+                    tour = 3;
+                    tourShow();
+                }
+                break;
+            case 3:
+                if (e.equals("selected")) {
+                    tour = 4;
+                    tourShow();
+                }
+                break;
+            case 4:
+                if (e.equals("move")) {
+                    tour = 5;
+                    tourShow();
+                }
+                break;
+            case 6:
+                if (e.equals("sheet")) {
+                    pulse(cardViews.get("عصا التحكم"));
+                } else if (e.equals("added:عصا التحكم")) {
+                    tour = 7;
+                    tourShow();
+                }
+                break;
+            case 8:
+                if (e.equals("play")) finishTour();
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void pulse(View v) {
+        stopPulse();
+        if (v == null) return;
+        pulsing = v;
+        android.animation.ValueAnimator va = android.animation.ValueAnimator.ofFloat(1f, 1.1f);
+        va.setDuration(550);
+        va.setRepeatMode(android.animation.ValueAnimator.REVERSE);
+        va.setRepeatCount(android.animation.ValueAnimator.INFINITE);
+        va.addUpdateListener(x -> {
+            float f = (Float) x.getAnimatedValue();
+            v.setScaleX(f);
+            v.setScaleY(f);
+        });
+        va.start();
+        pulseAnim = va;
+    }
+
+    private void stopPulse() {
+        if (pulseAnim != null) pulseAnim.cancel();
+        if (pulsing != null) {
+            pulsing.setScaleX(1f);
+            pulsing.setScaleY(1f);
+        }
+        pulseAnim = null;
+        pulsing = null;
+    }
+
+    /** Step 7: connect the joystick to the player (top-down movement: no gravity, move with the joystick). */
+    private void tourWire() {
+        if (wiring) return;
+        wiring = true;
+        nextBtn.setEnabled(false);
+        shell.save();
+        new Thread(() -> {
+            try {
+                ArrayList<String[]> kinds = CardOps.elementKinds();
+                String player = null;
+                String joy = null;
+                for (String[] k : kinds) {
+                    String t = k[1] == null ? "" : k[1].toUpperCase();
+                    if (joy == null && t.contains("JOYSTICK")) joy = k[0];
+                }
+                for (int i = kinds.size() - 1; i >= 0; i--) {
+                    String t = kinds.get(i)[1] == null ? "" : kinds.get(i)[1].toUpperCase();
+                    if (t.equals("BOX") || t.equals("CIRCLE")) {
+                        player = kinds.get(i)[0];
+                        break;
+                    }
+                }
+                if (player == null || joy == null) {
+                    throw new Exception("لم أجد اللاعب أو العصا. تأكد أنك أضفتَ «مربع» ثم «عصا التحكم»، ثم اضغط الزر مرة أخرى.");
+                }
+                CardOps.setProps(joy, "{\"width\":300,\"height\":300}");
+                CardOps.setProps(player, "{\"type\":\"DYNAMIC\",\"Fixed Rotation\":true}");
+                JsonArray g = new JsonArray();
+                g.add(block("setWorldGravity", "strength", "0"));
+                CardOps.addToSceneEvent(a, "OnCreate", g.toString(), null);
+                JsonArray m = new JsonArray();
+                m.add(block("moveWithJoystick", "body", player, "joystick", joy, "speed", "350"));
+                CardOps.addToSceneEvent(a, "OnStep", m.toString(), null);
+                a.runOnUiThread(() -> {
+                    wiring = false;
+                    nextBtn.setEnabled(true);
+                    tour = 8;
+                    tourShow();
+                });
+            } catch (Throwable t) {
+                a.runOnUiThread(() -> {
+                    wiring = false;
+                    nextBtn.setEnabled(true);
+                    error(t);
+                });
+            }
+        }).start();
     }
 }

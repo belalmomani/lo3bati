@@ -7,7 +7,10 @@ import android.content.Context;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.google.gson.JsonParser;
+import com.star4droid.star2d.Helpers.PropertySet;
+import com.star4droid.star2d.ui.Bridge;
 import com.star4droid.star2d.Helpers.editor.Project;
 import com.star4droid.star2d.editor.LibgdxEditor;
 import com.star4droid.star2d.ui.blocks.BlockCatalog;
@@ -16,6 +19,7 @@ import com.star4droid.star2d.ui.blocks.BlockModel;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Map;
 
 public final class CardOps {
     private CardOps() {}
@@ -73,5 +77,32 @@ public final class CardOps {
             m.save(vf);
             return scene;
         });
+    }
+    /** {name, TYPE} of every element of the open scene (TYPE such as BOX, CIRCLE, JOYSTICK), read from the live scene. */
+    public static ArrayList<String[]> elementKinds() throws Exception {
+        final ArrayList<String> names = elementNames();
+        return Gl.run(() -> {
+            ArrayList<String[]> out = new ArrayList<>();
+            for (String n : names) {
+                Actor actor = Bridge.actor(n);
+                if (actor == null) continue;
+                Map<String, String> live = Bridge.snapshot(PropertySet.getPropertySet(actor));
+                out.add(new String[]{n, String.valueOf(live.get("TYPE"))});
+            }
+            return out;
+        });
+    }
+
+    /** Sets properties of one element, for example {"width":300,"height":300}. */
+    public static void setProps(String name, String propsJson) throws Exception {
+        JsonObject o = new JsonObject();
+        o.addProperty("op", "set");
+        o.addProperty("name", name);
+        o.add("props", JsonParser.parseString(propsJson).getAsJsonObject());
+        JsonArray ops = new JsonArray();
+        ops.add(o);
+        JsonObject a = new JsonObject();
+        a.add("ops", ops);
+        EditTools.elements(a);
     }
 }
