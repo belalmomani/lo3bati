@@ -68,11 +68,11 @@ jobs:
 
       # ⚡ Build APK
       - name: Build APK with Gradle
-        run: ./gradlew clean assembleRelease
+        run: ./gradlew clean assembleRelease -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
       # ⚡ Build AAB
       - name: Build AAB with Gradle
-        run: ./gradlew bundleRelease
+        run: ./gradlew bundleRelease -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
       # 📦 Upload APK as artifact
       - name: Upload APK

@@ -55,7 +55,9 @@ jobs:
           KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
           KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        run: ./gradlew clean assembleRelease
+        # Modified for Lo3bati: gradle.properties gives Gradle only 1 GB, which ran out of memory while merging dex files.
+        # The bigger heap is passed here so gradle.properties (part of the template hash) stays unchanged.
+        run: ./gradlew clean assembleRelease -Dorg.gradle.jvmargs="-Xmx4g -XX:MaxMetaspaceSize=1g -Dfile.encoding=UTF-8"
 
       # 📦 Upload APK as artifact
       - name: Upload APK
