@@ -28,6 +28,8 @@ import com.star4droid.star2d.remote.CardOps;
 import com.star4droid.star2d.ui.panels.ElementsPanel;
 
 final class SimpleMode {
+    /** Shown in the top bar so a screenshot tells which build is really running. */
+    static final String BUILD_TAG = "نسخة 15";
     private static final String FILE = "lo3bati_ui";
     private static final String KEY = "simple_mode";
 
@@ -129,7 +131,7 @@ final class SimpleMode {
 
         // ---- top: bar + guide
         LinearLayout topCol = Ui.column(a);
-        topCol.addView(topBar(), Ui.matchWrap());
+        topCol.addView(topBar(), new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(52)));
         hintBox = Ui.row(a);
         hintBox.setGravity(Gravity.CENTER_VERTICAL);
         hintBox.setBackground(Ui.rounded(0xE6FFF3C4, dp(14)));
@@ -158,7 +160,7 @@ final class SimpleMode {
         toolsBar.setBackgroundColor(0xF0181A1E);
         toolsBar.setPadding(dp(6), dp(6), dp(6), dp(6));
         toolsBar.setClickable(true);
-        bottom.addView(toolsBar, Ui.matchWrap());
+        bottom.addView(toolsBar, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(82)));
         updateContext();
 
         LinearLayout main = Ui.row(a);
@@ -174,7 +176,7 @@ final class SimpleMode {
         more.setPadding(dp(8), dp(16), dp(8), dp(16));
         more.setOnClickListener(v -> showMore());
         main.addView(more, Ui.margins(Ui.weight(1), a, 4, 0, 4, 0));
-        bottom.addView(main, Ui.matchWrap());
+        bottom.addView(main, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dp(86)));
 
         // ---- numbered steps popup (optional)
         stepsSheet = Ui.column(a);
@@ -200,6 +202,8 @@ final class SimpleMode {
         LinearLayout top = Ui.row(a);
         top.setGravity(Gravity.CENTER_VERTICAL);
         top.setPadding(dp(8), dp(6), dp(8), dp(6));
+        TextView tag = Ui.text(a, BUILD_TAG, 10.5f, Ui.TEXT_3);
+        top.addView(tag, Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 0, 0, 6, 0));
         top.addView(smallButton("رجوع", v -> shell.exitProject()), new LinearLayout.LayoutParams(-2, -2));
         top.addView(smallButton("حفظ", v -> shell.save()), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
         top.addView(smallButton("تراجع", v -> Bridge.gl(() -> Bridge.controls().actionUndo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
@@ -220,7 +224,7 @@ final class SimpleMode {
         sc.setHorizontalScrollBarEnabled(false);
         sc.setBackgroundColor(0xF0181A1E);
         sc.setClickable(true);
-        sc.addView(top, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        sc.addView(top, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         return sc;
     }
 
