@@ -29,7 +29,7 @@ import com.star4droid.star2d.ui.panels.ElementsPanel;
 
 final class SimpleMode {
     /** Shown in the top bar so a screenshot tells which build is really running. */
-    static final String BUILD_TAG = "نسخة 16";
+    static final String BUILD_TAG = "نسخة 19";
     private static final String FILE = "lo3bati_ui";
     private static final String KEY = "simple_mode";
 
@@ -87,6 +87,7 @@ final class SimpleMode {
     private TextView hint;
     private LinearLayout sheet;
     private LinearLayout stepsSheet;
+    private int pictureCount = 0;
     // first-run lesson
     private int tour = 0; // 0 = off, 1..8 = current step
     private boolean tourAsked = false;
@@ -227,19 +228,14 @@ final class SimpleMode {
         TextView tag = Ui.text(a, BUILD_TAG, 10.5f, Ui.TEXT_3);
         top.addView(tag, Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 0, 0, 6, 0));
         top.addView(smallButton("رجوع", v -> shell.exitProject()), new LinearLayout.LayoutParams(-2, -2));
-        top.addView(smallButton("حفظ", v -> shell.save()), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
         top.addView(smallButton("تراجع", v -> Bridge.gl(() -> Bridge.controls().actionUndo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
-        top.addView(smallButton("إعادة", v -> Bridge.gl(() -> Bridge.controls().actionRedo())), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
         // A plain View with wrap_content height takes ALL the height it is offered (View.getDefaultSize), which made this
         // bar as tall as the screen. Give the spacer a fixed 1px height.
         top.addView(new View(a), new LinearLayout.LayoutParams(0, 1, 1f));
         TextView steps = smallButton("الخطوات", v -> showSteps());
         steps.setBackground(Ui.rounded(0xFF1E88E5, dp(12)));
         top.addView(steps, Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
-        top.addView(smallButton("احترافي", v -> {
-            set(a, false);
-            shell.build();
-        }), Ui.margins(new LinearLayout.LayoutParams(-2, -2), a, 4, 0, 0, 0));
+        // Save, redo and the professional mode moved into "المزيد" to keep this bar nearly empty.
         // Scrollable so nothing is ever cut off on narrow screens
         HorizontalScrollView sc = new HorizontalScrollView(a);
         sc.setFillViewport(true);
@@ -316,7 +312,7 @@ final class SimpleMode {
         pics.setPadding(dp(14), dp(12), dp(14), dp(12));
         pics.setBackground(Ui.rounded(0xFF22402A, dp(14)));
         pics.addView(Ui.smallIcon(a, R.drawable.ic_s2_collections, 0xFF66BB6A, 30));
-        TextView picsText = Ui.text(a, "صور شخصيات ورسومات جاهزة", 15, Ui.TEXT);
+        TextView picsText = Ui.text(a, "كل الصور الجاهزة (حزم كاملة)", 15, Ui.TEXT);
         picsText.setTypeface(Typeface.DEFAULT_BOLD);
         picsText.setPadding(dp(10), 0, 0, 0);
         pics.addView(picsText);
@@ -325,6 +321,7 @@ final class SimpleMode {
             showCollections();
         });
         col.addView(pics, Ui.margins(Ui.matchWrap(), a, 4, 4, 4, 10));
+        picturesSection(col);
         section(col, "شخصية أو عدو", THINGS);
         TextView shapeNote = Ui.text(a, "اختر شكلاً، ثم ألبسه صورة شخصية أو عدو من زر «المظهر».", 12.5f, Ui.TEXT_3);
         shapeNote.setPadding(dp(6), 0, dp(6), dp(8));
@@ -502,18 +499,40 @@ final class SimpleMode {
     // =============================================================== more (technical panels, still reachable)
 
     private void showMore() {
-        final String[] names = {"خطوات صناعة اللعبة", "إعدادات الشيء", "ماذا يحدث عندما...؟", "كل الأشياء في اللعبة", "إعدادات اللعبة"};
-        new AlertDialog.Builder(a)
-                .setTitle("المزيد")
-                .setItems(names, (d, which) -> {
-                    hideSheet();
-                    if (which == 0) showSteps();
-                    else if (which == 1) shell.togglePanel(shell.properties);
-                    else if (which == 2) shell.togglePanel(shell.events);
-                    else if (which == 3) shell.togglePanel(shell.elements);
-                    else shell.togglePanel(shell.settings);
-                })
-                .show();
+        hideSheet();
+        final ArrayList<String> names = new ArrayList<>();
+        final ArrayList<Runnable> acts = new ArrayList<>();
+        names.add("حفظ لعبتك");
+        acts.add(() -> {
+            shell.save();
+            setHint("تم حفظ لعبتك.");
+        });
+        names.add("إعادة (عكس التراجع)");
+        acts.add(() -> Bridge.gl(() -> Bridge.controls().actionRedo()));
+        if (selected) {
+            names.add("انسخ هذا الشيء");
+            acts.add(() -> shell.duplicateSelected());
+        }
+        names.add("الخلفية والبيئة");
+        acts.add(this::showBackground);
+        names.add("الأصوات والمؤثرات");
+        acts.add(this::showSounds);
+        names.add("خطوات صناعة اللعبة");
+        acts.add(this::showSteps);
+        names.add("إعدادات الشيء (متقدم)");
+        acts.add(() -> shell.togglePanel(shell.properties));
+        names.add("ماذا يحدث عندما...؟ (متقدم)");
+        acts.add(() -> shell.togglePanel(shell.events));
+        names.add("كل الأشياء في اللعبة (متقدم)");
+        acts.add(() -> shell.togglePanel(shell.elements));
+        names.add("إعدادات اللعبة (متقدم)");
+        acts.add(() -> shell.togglePanel(shell.settings));
+        names.add("الوضع الاحترافي (كل أدوات المحرر)");
+        acts.add(() -> {
+            set(a, false);
+            shell.build();
+        });
+        menu("المزيد", names.toArray(new String[0]), acts.toArray(new Runnable[0]));
     }
 
     // =============================================================== selection feedback
@@ -535,6 +554,8 @@ final class SimpleMode {
         if (toolsBar == null) return;
         toolsBar.removeAllViews();
         if (selected) {
+            contextLabel.setVisibility(View.VISIBLE);
+            toolsBar.setVisibility(View.VISIBLE);
             contextLabel.setText("أدوات الشيء المحدد");
             moveBtn = addCtx(R.drawable.ic_s2_move, "حرّك", v -> {
                 shell.setTool("move");
@@ -543,12 +564,12 @@ final class SimpleMode {
             });
             addCtx(R.drawable.ic_s2_palette, "المظهر", v -> showAppearance());
             addCtx(R.drawable.ic_s2_wand, "السلوك", v -> showBehavior());
-            addCtx(R.drawable.ic_s2_copy, "انسخ", v -> shell.duplicateSelected());
             addCtx(R.drawable.ic_s2_delete, "احذف", v -> shell.deleteSelected());
         } else {
-            contextLabel.setText("أدوات اللعبة");
-            addCtx(R.drawable.ic_s2_image, "الخلفية", v -> showBackground());
-            addCtx(R.drawable.ic_s2_sound, "الأصوات", v -> showSounds());
+            // Nothing selected: only the two big buttons remain on screen.
+            moveBtn = null;
+            contextLabel.setVisibility(View.GONE);
+            toolsBar.setVisibility(View.GONE);
         }
     }
 
@@ -1137,5 +1158,99 @@ final class SimpleMode {
                 });
             }
         }).start();
+    }
+    // =============================================================== ready characters and things (with pictures)
+    // One tap copies the picture into the game's images folder and adds a box that wears it.
+
+    // {Arabic name, pack, file, base name of the element}
+    private static final String[][] PICTURES = {
+            {"لاعب", "platformer", "hero.png", "hero"},
+            {"فضائي", "kenney_alien", "alienPink_stand.png", "alien"},
+            {"سيارة زرقاء", "racing", "car_blue.png", "carBlue"},
+            {"سيارة حمراء", "racing", "car_red.png", "carRed"},
+            {"سيارة صفراء", "racing", "car_yellow.png", "carYellow"},
+            {"سفينة فضاء", "space", "ship.png", "ship"},
+            {"طائر", "sky_flyer", "bird.png", "bird"},
+            {"عملة", "platformer", "coin.png", "coin"},
+            {"نجمة", "starter", "star.png", "star"},
+            {"صخرة", "space", "rock.png", "rock"},
+            {"صندوق", "platformer", "crate.png", "crate"},
+    };
+
+    private void picturesSection(LinearLayout col) {
+        col.addView(Ui.sectionLabel(a, "شخصيات وأشياء جاهزة بالصور"));
+        GridLayout g = new GridLayout(a);
+        g.setColumnCount(3);
+        for (String[] it : PICTURES) {
+            final String label = it[0];
+            final String pack = it[1];
+            final String file = it[2];
+            final String base = it[3];
+            LinearLayout card = Ui.column(a);
+            card.setGravity(Gravity.CENTER);
+            card.setPadding(dp(6), dp(10), dp(6), dp(8));
+            card.setBackground(Ui.ripple(Ui.SURFACE_2, dp(14)));
+            android.widget.ImageView thumb = new android.widget.ImageView(a);
+            try (java.io.InputStream in = a.getAssets().open("collections/" + pack + "/" + file)) {
+                thumb.setImageBitmap(android.graphics.BitmapFactory.decodeStream(in));
+            } catch (Exception ignored) {
+            }
+            thumb.setScaleType(android.widget.ImageView.ScaleType.FIT_CENTER);
+            card.addView(thumb, new LinearLayout.LayoutParams(dp(56), dp(56)));
+            TextView t = Ui.text(a, label, 13, Ui.TEXT);
+            t.setGravity(Gravity.CENTER);
+            t.setPadding(0, dp(6), 0, 0);
+            card.addView(t);
+            cardViews.put(label, card);
+            card.setOnClickListener(v -> {
+                hideSheet();
+                addPicture(label, pack, file, base);
+            });
+            GridLayout.LayoutParams lp = new GridLayout.LayoutParams(GridLayout.spec(GridLayout.UNDEFINED), GridLayout.spec(GridLayout.UNDEFINED, 1f));
+            lp.width = 0;
+            lp.setMargins(dp(4), dp(4), dp(4), dp(4));
+            g.addView(card, lp);
+        }
+        col.addView(g, Ui.matchWrap());
+    }
+
+    private void addPicture(final String label, final String pack, final String file, final String base) {
+        shell.save();
+        Bridge.query(() -> Bridge.editor().getProject().getPath(), path -> new Thread(() -> {
+            try {
+                java.io.File images = new java.io.File(path, "images");
+                images.mkdirs();
+                if (!CollectionsDialog.copy(a, pack + "/" + file, images)) {
+                    throw new Exception("تعذّر نسخ الصورة إلى لعبتك.");
+                }
+                // keep the picture's shape: its longest side becomes 120
+                android.graphics.BitmapFactory.Options o = new android.graphics.BitmapFactory.Options();
+                o.inJustDecodeBounds = true;
+                try (java.io.InputStream in = a.getAssets().open("collections/" + pack + "/" + file)) {
+                    android.graphics.BitmapFactory.decodeStream(in, null, o);
+                }
+                float k = 120f / Math.max(1, Math.max(o.outWidth, o.outHeight));
+                int w = Math.max(16, Math.round(o.outWidth * k));
+                int h = Math.max(16, Math.round(o.outHeight * k));
+                String name = CardOps.uniqueName(base);
+                JsonObject props = new JsonObject();
+                props.addProperty("x", 200 + 70 * (pictureCount % 6));
+                props.addProperty("y", 250);
+                props.addProperty("width", w);
+                props.addProperty("height", h);
+                props.addProperty("image", "/" + file);
+                props.addProperty("type", "STATIC"); // stays where it is put (the lesson makes the player dynamic)
+                CardOps.addElement(name, "BOX", props.toString());
+                pictureCount++;
+                added = true;
+                done[2] = true;
+                a.runOnUiThread(() -> {
+                    setHint("أضفتُ «" + label + "» إلى لعبتك. المسها لتختارها وتحرّكها.");
+                    if (tour == 2) tourEvent("added:مربع");
+                });
+            } catch (Throwable t) {
+                a.runOnUiThread(() -> error(t));
+            }
+        }).start());
     }
 }

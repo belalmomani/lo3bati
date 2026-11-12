@@ -105,4 +105,29 @@ public final class CardOps {
         a.add("ops", ops);
         EditTools.elements(a);
     }
+    /** A free element name based on {@code base} (base1, base2...), checked against the live scene. */
+    public static String uniqueName(String base) throws Exception {
+        return Gl.run(() -> {
+            for (int i = 1; i < 1000; i++) {
+                if (Bridge.actor(base + i) == null) return base + i;
+            }
+            return base + System.currentTimeMillis();
+        });
+    }
+
+    /** Adds one element (type such as BOX) with properties, using the same operation the AI tools use, and checks that it exists. */
+    public static void addElement(String name, String type, String propsJson) throws Exception {
+        JsonObject o = new JsonObject();
+        o.addProperty("op", "add");
+        o.addProperty("type", type);
+        o.addProperty("name", name);
+        o.add("props", JsonParser.parseString(propsJson).getAsJsonObject());
+        JsonArray ops = new JsonArray();
+        ops.add(o);
+        JsonObject a = new JsonObject();
+        a.add("ops", ops);
+        EditTools.elements(a);
+        boolean ok = Gl.run(() -> Bridge.actor(name) != null);
+        if (!ok) throw new Exception("لم تُضَف الصورة إلى اللعبة. جرّب مرة أخرى.");
+    }
 }
