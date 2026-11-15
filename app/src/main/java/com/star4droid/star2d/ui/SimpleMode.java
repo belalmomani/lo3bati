@@ -29,7 +29,7 @@ import com.star4droid.star2d.ui.panels.ElementsPanel;
 
 final class SimpleMode {
     /** Shown in the top bar so a screenshot tells which build is really running. */
-    static final String BUILD_TAG = "نسخة 19";
+    static final String BUILD_TAG = "نسخة 21";
     private static final String FILE = "lo3bati_ui";
     private static final String KEY = "simple_mode";
 
@@ -452,6 +452,15 @@ final class SimpleMode {
         stepsSheet.setVisibility(View.VISIBLE);
     }
 
+    /** Saves and closes the open game, then the home screen shows the new-game dialog or the ready games. */
+    private void startNewGame(boolean fromReady) {
+        shell.save();
+        shell.panels.hide();
+        if (fromReady) ProjectsHomeView.openTemplatesOnShow = true;
+        else ProjectsHomeView.openNewOnShow = true;
+        Bridge.gl(() -> Bridge.app().closeProject());
+    }
+
     private void hideSteps() {
         if (stepsSheet != null) stepsSheet.setVisibility(View.GONE);
     }
@@ -461,12 +470,13 @@ final class SimpleMode {
         done[n] = true;
         switch (n) {
             case 1:
-                Dialogs.confirm(a, "لعبة جديدة", "سنحفظ لعبتك الحالية ونغلقها ثم نبدأ لعبة جديدة. هل تريد المتابعة؟", "متابعة", () -> {
-                    shell.save();
-                    shell.panels.hide();
-                    ProjectsHomeView.openNewOnShow = true;
-                    Bridge.gl(() -> Bridge.app().closeProject());
-                });
+                new AlertDialog.Builder(a)
+                        .setTitle("لعبة جديدة")
+                        .setMessage("سنحفظ لعبتك الحالية ونغلقها. كيف تريد أن تبدأ؟")
+                        .setPositiveButton("لعبة فارغة", (d, w) -> startNewGame(false))
+                        .setNeutralButton("من لعبة جاهزة", (d, w) -> startNewGame(true))
+                        .setNegativeButton("إلغاء", null)
+                        .show();
                 break;
             case 2:
                 showSheet();
@@ -939,13 +949,41 @@ final class SimpleMode {
 
     private static final String PREF_TOUR_DONE = "tour_done";
 
+    private static final String PREF_LEVEL_CHOSEN = "level_chosen";
+
     /** Called by EditorShell every time the editor becomes visible (a project is open). */
     void onShown() {
         if (tourAsked || tour != 0) return;
         tourAsked = true;
+        if (!prefs(a).getBoolean(PREF_LEVEL_CHOSEN, false)) {
+            askLevel();
+            return;
+        }
+        askTour();
+    }
+
+    /** First run: beginner = easy mode with the lesson, professional = the full editor right away. */
+    private void askLevel() {
+        new AlertDialog.Builder(a)
+                .setTitle("مرحباً بك في لعبتي!")
+                .setMessage("هل سبق أن صنعتَ ألعاباً؟")
+                .setPositiveButton("لا، أنا مبتدئ", (d, w) -> {
+                    prefs(a).edit().putBoolean(PREF_LEVEL_CHOSEN, true).apply();
+                    askTour();
+                })
+                .setNegativeButton("نعم، أنا محترف", (d, w) -> {
+                    prefs(a).edit().putBoolean(PREF_LEVEL_CHOSEN, true).putBoolean(PREF_TOUR_DONE, true).apply();
+                    set(a, false);
+                    shell.build();
+                })
+                .setCancelable(false)
+                .show();
+    }
+
+    private void askTour() {
         if (prefs(a).getBoolean(PREF_TOUR_DONE, false)) return;
         new AlertDialog.Builder(a)
-                .setTitle("أهلاً بك في لعبتي!")
+                .setTitle("لنصنع لعبتك الأولى")
                 .setMessage("هل تريد أن نصنع معاً لعبتك الأولى خطوة بخطوة؟ سأريك أين تضغط ولماذا، وتستغرق دقائق قليلة.")
                 .setPositiveButton("نعم، هيا", (d, w) -> startTour())
                 .setNegativeButton("لاحقاً", (d, w) -> {
